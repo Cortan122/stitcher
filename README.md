@@ -21,5 +21,5 @@ You might also have to modify some of the constants defined at the top of the py
 
 - [ ] Use a neural network as a custom Feature detector
 - [ ] Use tesseract OCR as a custom Feature detector
-- [ ] Parse argv options
+- [x] Parse argv options
 - [ ] Improve repeated UI detection

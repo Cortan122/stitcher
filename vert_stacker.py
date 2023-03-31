@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
-import cProfile
-import sys
+from argparse import ArgumentParser
 from collections import Counter
 from functools import reduce
 
@@ -229,7 +228,29 @@ def main(paths, outpath):
   cv2.imwrite(outpath, res)
 
 
-output_path = sys.argv[-1]
-image_paths = sys.argv[1:-1]
-main(image_paths, output_path)
-# cProfile.run("main(image_paths, output_path)")
+def parse_argv():
+  parser = ArgumentParser(
+    description="Automatically align and vertically stack screenshots",
+  )
+  parser.add_argument("infiles", help="list of input image files", type=str, nargs='+')
+  parser.add_argument("outfile", help="output image file", type=str)
+  parser.add_argument("-s", "--dont-use-sift", action="store_true", help="use a faster (but worse) Feature Detection algorithm")
+  parser.add_argument("-t", "--alignment-threshold", metavar="threshold", default=0.015, help="number of iterations", type=float)
+  parser.add_argument("-T", "--header-threshold", metavar="threshold", default=10, help="threshold used when determining the fixed UI crop", type=int)
+  parser.add_argument("-G", "--greedy-header", action="store_true", help="be more greedy when determining the fixed UI crop")
+  parser.add_argument("-H", "--horizontal-margin", metavar="pixels", default=0, help="crop this many pixels horizontaly", type=int)
+  parser.add_argument("-R", "--reference-header", metavar="index", default=0, help="the index of the image used when determining the fixed UI crop", type=int)
+
+  return parser.parse_args()
+
+
+if __name__ == '__main__':
+  args = parse_argv()
+  USE_SIFT = not args.dont_use_sift
+  ALIGNMENT_SCORE_THRESHOLD = args.alignment_threshold
+  TOP_BOTTOM_THRESHOLD = args.header_threshold
+  GREEDY_HEADER = args.greedy_header
+  HORIZONTAL_MARGIN = args.horizontal_margin
+  REFERENCE_HEADER_IMAGE = args.reference_header
+
+  main(args.infiles, args.outfile)
